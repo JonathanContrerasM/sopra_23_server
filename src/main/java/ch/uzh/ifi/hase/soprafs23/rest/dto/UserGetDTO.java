@@ -6,43 +6,45 @@ import java.util.Date;
 
 public class UserGetDTO {
 
-  private Long id;
-  private String email;
-  private String username;
-  private UserStatus status;
-  private Date registrationDate;
+    private Long id;
+    private String email;
+    private String username;
+    private UserStatus status;
+    private Date registrationDate;
+    private Date birthdate;
 
-  public Long getId() {
-    return id;
-  }
 
-  public void setId(Long id) {
-    this.id = id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public String getEmail() {
-    return email;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+    public String getEmail() {
+        return email;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public UserStatus getStatus() {
-    return status;
-  }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-  public void setStatus(UserStatus status) {
-    this.status = status;
-  }
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
 
     public Date getRegistrationDate() {
         return registrationDate;
@@ -50,5 +52,13 @@ public class UserGetDTO {
 
     public void setRegistrationDate(Date registrationDate) {
         this.registrationDate = registrationDate;
+    }
+
+    public Date getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(Date birthdate) {
+        this.birthdate = birthdate;
     }
 }
