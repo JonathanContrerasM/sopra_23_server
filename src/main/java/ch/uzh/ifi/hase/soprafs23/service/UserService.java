@@ -52,6 +52,22 @@ public class UserService {
     return newUser;
   }
 
+    public User loginUser(User userInput) {
+        User realUser = userRepository.findByUsername(userInput.getUsername());
+
+        if (realUser == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("username not found"));
+        }
+
+        //Check if the input password equals the one matching with the username
+        if (realUser.getPassword().equals(userInput.getPassword())) {
+            log.debug("Login worked {}", userInput);
+            return realUser;
+        }
+        //if bug check for the exception
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("password does not match with username"));
+    }
+
   /**
    * This is a helper method that will check the uniqueness criteria of the
    * username and the name
