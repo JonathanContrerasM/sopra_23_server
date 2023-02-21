@@ -76,4 +76,23 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "email", "is"));
     }
   }
+
+    /**
+     private void checkIfUsernameExists(String username) {
+     User userByUsername = userRepository.findByUsername(username);
+
+     if (userByUsername != null) {
+     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+     String.format("username already taken"));
+     }
+     }
+
+     private void checkIfEmailExists(String email) {
+     User userByUsername = userRepository.findByEmail(email);
+
+     if (userByUsername != null) {
+     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+     String.format("email already taken"));
+     }
+     }*/
 }
