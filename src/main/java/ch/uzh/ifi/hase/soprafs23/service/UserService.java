@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public class UserService {
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setRegistrationDate(new Date());
     checkIfUserExists(newUser);
     // saves the given entity but data is only persisted in the database once
     // flush() is called
@@ -56,7 +58,7 @@ public class UserService {
         User realUser = userRepository.findByUsername(userInput.getUsername());
 
         if (realUser == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("username not found"));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "username not found");
         }
 
         //Check if the input password equals the one matching with the username
@@ -65,7 +67,7 @@ public class UserService {
             return realUser;
         }
         //if bug check for the exception
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, String.format("password does not match with username"));
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password does not match with username");
     }
 
   /**
@@ -92,6 +94,7 @@ public class UserService {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "email", "is"));
     }
   }
+
 
     /**
      private void checkIfUsernameExists(String username) {
