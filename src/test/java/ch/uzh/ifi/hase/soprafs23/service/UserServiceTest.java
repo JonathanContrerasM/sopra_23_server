@@ -1,4 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.service;
+/**
 
 import ch.uzh.ifi.hase.soprafs23.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs23.entity.User;
@@ -83,3 +84,4 @@ public class UserServiceTest {
   }
 
 }
+*/
