@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,32 +28,48 @@ import java.util.UUID;
 @Transactional
 public class UserService {
 
-  private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
-  private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-  @Autowired
-  public UserService(@Qualifier("userRepository") UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
+    @Autowired
+    public UserService(@Qualifier("userRepository") UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-  public List<User> getUsers() {
-    return this.userRepository.findAll();
-  }
+    public List<User> getUsers() {
+        return this.userRepository.findAll();
+    }
 
-  public User createUser(User newUser) {
-    newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
-    newUser.setRegistrationDate(new Date());
-    checkIfUserExists(newUser);
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
-    newUser = userRepository.save(newUser);
-    userRepository.flush();
+    public User getUser(long id) {
+        User user = userRepository.findById(id);
 
-    log.debug("Created Information for User: {}", newUser);
-    return newUser;
-  }
+        //checkIfUserIsNull(user);
+        return user;
+    }
+
+    public User createUser(User newUser) {
+
+        String stringDate = getStringDate();
+
+        newUser.setToken(UUID.randomUUID().toString());
+        newUser.setStatus(UserStatus.ONLINE);
+        newUser.setRegistrationDate(stringDate);
+        checkIfUserExists(newUser);
+        // saves the given entity but data is only persisted in the database once
+        // flush() is called
+        newUser = userRepository.save(newUser);
+        userRepository.flush();
+
+        log.debug("Created Information for User: {}", newUser);
+        return newUser;
+    }
+
+    private static String getStringDate() {
+        Date date = new Date();
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return DateFor.format(date);
+    }
 
     public User loginUser(User userInput) {
         User realUser = userRepository.findByUsername(userInput.getUsername());
@@ -63,6 +80,11 @@ public class UserService {
 
         //Check if the input password equals the one matching with the username
         if (realUser.getPassword().equals(userInput.getPassword())) {
+
+            //Overwrite Online Status
+            realUser.setStatus(UserStatus.ONLINE);
+            userRepository.saveAndFlush(realUser);
+
             log.debug("Login worked {}", userInput);
             return realUser;
         }
@@ -70,48 +92,89 @@ public class UserService {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "password does not match with username");
     }
 
-  /**
-   * This is a helper method that will check the uniqueness criteria of the
-   * username and the name
-   * defined in the User entity. The method will do nothing if the input is unique
-   * and throw an error otherwise.
-   *
-   * @param userToBeCreated
-   * @throws org.springframework.web.server.ResponseStatusException
-   * @see User
-   */
-  private void checkIfUserExists(User userToBeCreated) {
-    User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    User userByEmail = userRepository.findByEmail(userToBeCreated.getEmail());
+    public User updateUser(User userInput, long id) {
 
-    String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
-    if (userByUsername != null && userByEmail != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-          String.format(baseErrorMessage, "username and the email", "are"));
-    } else if (userByUsername != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
-    } else if (userByEmail != null) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "email", "is"));
+        User userFromDB = userRepository.findById(id);
+
+        //check if username already is taken
+        //checkIfUsernameExists(userInput.getUsername());
+
+        //Overwrite
+        userFromDB.setBirthdate(userInput.getBirthdate());
+        userFromDB.setUsername(userInput.getUsername());
+        userRepository.saveAndFlush(userFromDB);
+
+        return userFromDB;
     }
-  }
 
 
     /**
-     private void checkIfUsernameExists(String username) {
-     User userByUsername = userRepository.findByUsername(username);
+     * This is a helper method that will check the uniqueness criteria of the
+     * username and the name
+     * defined in the User entity. The method will do nothing if the input is unique
+     * and throw an error otherwise.
+     *
+     * @param userToBeCreated
+     * @throws org.springframework.web.server.ResponseStatusException
+     * @see User
+     */
+    private void checkIfUserExists(User userToBeCreated) {
+        User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
+        User userByEmail = userRepository.findByEmail(userToBeCreated.getEmail());
 
-     if (userByUsername != null) {
-     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-     String.format("username already taken"));
-     }
-     }
+        String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
+        if (userByUsername != null && userByEmail != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format(baseErrorMessage, "username and the email", "are"));
+        }
+        else if (userByUsername != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
+        }
+        else if (userByEmail != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "email", "is"));
+        }
+    }
 
-     private void checkIfEmailExists(String email) {
-     User userByUsername = userRepository.findByEmail(email);
+    private void checkIfUserIsNull(User user) {
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "User with this username does not exist");
+        }
+    }
 
-     if (userByUsername != null) {
-     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-     String.format("email already taken"));
-     }
-     }*/
+    private void checkIfUsernameExists(String username) {
+        User userByUsername = userRepository.findByUsername(username);
+
+        if (userByUsername != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    String.format("username already taken"));
+        }
+    }
+
+    private void checkIfEmailExists(String email) {
+        User userByUsername = userRepository.findByEmail(email);
+
+        if (userByUsername != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "email already taken");
+        }
+    }
+
+    public User getUserById(long id) {
+        User userById = userRepository.findById(id);
+        //check if the user even exists
+        if (userById == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "The user with this id does not exist!");
+        }
+        return userById;
+    }
+
+    public User setUserOffline(long id) {
+        User userOffline = userRepository.findById(id);
+        userOffline.setStatus(UserStatus.OFFLINE);
+        userRepository.saveAndFlush(userOffline);
+
+        return userOffline;
+    }
 }
