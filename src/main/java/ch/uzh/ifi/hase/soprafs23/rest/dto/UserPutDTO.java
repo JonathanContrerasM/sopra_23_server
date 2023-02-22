@@ -1,8 +1,7 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
-import java.util.Date;
 
-public class UserPostDTO {
+public class UserPutDTO {
 
     private String email;
 
@@ -10,6 +9,7 @@ public class UserPostDTO {
 
     private String username;
 
+    private String birthdate;
 
 
     public String getEmail() {
@@ -36,4 +36,13 @@ public class UserPostDTO {
         this.username = username;
     }
 
+    public String getBirthdate() {
+        return birthdate;
+    }
+
+    public void setBirthdate(String birthdate) {
+        this.birthdate = birthdate;
+    }
 }
+
+
