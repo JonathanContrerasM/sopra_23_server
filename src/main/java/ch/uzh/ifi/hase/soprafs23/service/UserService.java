@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -48,9 +49,12 @@ public class UserService {
     }
 
     public User createUser(User newUser) {
+
+        String stringDate = getStringDate();
+
         newUser.setToken(UUID.randomUUID().toString());
-        newUser.setStatus(UserStatus.OFFLINE);
-        newUser.setRegistrationDate(new Date());
+        newUser.setStatus(UserStatus.ONLINE);
+        newUser.setRegistrationDate(stringDate);
         checkIfUserExists(newUser);
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -59,6 +63,12 @@ public class UserService {
 
         log.debug("Created Information for User: {}", newUser);
         return newUser;
+    }
+
+    private static String getStringDate() {
+        Date date = new Date();
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return DateFor.format(date);
     }
 
     public User loginUser(User userInput) {
@@ -70,6 +80,11 @@ public class UserService {
 
         //Check if the input password equals the one matching with the username
         if (realUser.getPassword().equals(userInput.getPassword())) {
+
+            //Overwrite Online Status
+            realUser.setStatus(UserStatus.ONLINE);
+            userRepository.saveAndFlush(realUser);
+
             log.debug("Login worked {}", userInput);
             return realUser;
         }
@@ -141,7 +156,7 @@ public class UserService {
 
         if (userByUsername != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("email already taken"));
+                    "email already taken");
         }
     }
 
@@ -150,36 +165,16 @@ public class UserService {
         //check if the user even exists
         if (userById == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("The user with this id does not exist!"));
+                    "The user with this id does not exist!");
         }
         return userById;
     }
 
-
     public User setUserOffline(long id) {
         User userOffline = userRepository.findById(id);
         userOffline.setStatus(UserStatus.OFFLINE);
-        return  userOffline;
+        userRepository.saveAndFlush(userOffline);
+
+        return userOffline;
     }
-
-    public User updateUser(User inputUser, String username, Date birthdate) {
-        //Add check if Username is already taken
-        if (inputUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    String.format("The user with this id does not exist!"));
-        }
-
-
-        inputUser.setUsername(username);
-        inputUser.setBirthdate(birthdate);
-
-        userRepository.save(inputUser);
-        userRepository.flush();
-
-        log.debug("Updated information for User: {}", inputUser);
-        return inputUser;
-
-    }
-
-
 }

@@ -1,6 +1,5 @@
 package ch.uzh.ifi.hase.soprafs23.rest.dto;
 
-import java.util.Date;
 
 public class UserPutDTO {
 
@@ -10,7 +9,7 @@ public class UserPutDTO {
 
     private String username;
 
-    private Date birthdate;
+    private String birthdate;
 
 
     public String getEmail() {
@@ -37,11 +36,11 @@ public class UserPutDTO {
         this.username = username;
     }
 
-    public Date getBirthdate() {
+    public String getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
+    public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
     }
 }
