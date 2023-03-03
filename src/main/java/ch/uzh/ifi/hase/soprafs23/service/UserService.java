@@ -44,7 +44,7 @@ public class UserService {
     public User getUser(long id) {
         User user = userRepository.findById(id);
 
-        //checkIfUserIsNull(user);
+        checkIfUserFromIdIsNull(user);
         return user;
     }
 
@@ -52,9 +52,12 @@ public class UserService {
 
         String stringDate = getStringDate();
 
+        Date date = new Date();
+
         newUser.setToken(UUID.randomUUID().toString());
         newUser.setStatus(UserStatus.ONLINE);
         newUser.setRegistrationDate(stringDate);
+        newUser.setCreationDate(date);
         checkIfUserExists(newUser);
         // saves the given entity but data is only persisted in the database once
         // flush() is called
@@ -70,6 +73,7 @@ public class UserService {
         SimpleDateFormat DateFor = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return DateFor.format(date);
     }
+
 
     public User loginUser(User userInput) {
         User realUser = userRepository.findByUsername(userInput.getUsername());
@@ -95,6 +99,7 @@ public class UserService {
     public User updateUser(User userInput, long id) {
 
         User userFromDB = userRepository.findById(id);
+        checkIfUserFromIdIsNull(userFromDB);
 
         //check if username already is taken
         //checkIfUsernameExists(userInput.getUsername());
@@ -124,21 +129,21 @@ public class UserService {
 
         String baseErrorMessage = "The %s provided %s not unique. Therefore, the user could not be created!";
         if (userByUsername != null && userByEmail != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
                     String.format(baseErrorMessage, "username and the email", "are"));
         }
         else if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "username", "is"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "username", "is"));
         }
         else if (userByEmail != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format(baseErrorMessage, "email", "is"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, String.format(baseErrorMessage, "email", "is"));
         }
     }
 
-    private void checkIfUserIsNull(User user) {
+    private void checkIfUserFromIdIsNull(User user) {
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "User with this username does not exist");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User with this ID does not exist");
         }
     }
 
