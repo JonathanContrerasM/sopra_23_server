@@ -79,4 +79,35 @@ public class UserServiceIntegrationTest {
         // check that an error is thrown
         assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));
     }
+
+
+    @Test
+    public void createUser_duplicateEmail_throwsException() {
+        assertNull(userRepository.findByUsername("testUsername"));
+
+        User testUser = new User();
+        testUser.setEmail("Email");
+        testUser.setUsername("testUsername");
+        testUser.setPassword("1234");
+        User createdUser = userService.createUser(testUser);
+
+        // attempt to create second user with same username
+        User testUser2 = new User();
+
+        // change the name but forget about the username
+        testUser2.setEmail("Email");
+        testUser2.setUsername("testUsername1");
+        testUser2.setPassword("1234");
+
+        // check that an error is thrown
+        assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser2));
+    }
+
+    @Test
+    public void getUser_IdNonExistent_throwsException() {
+        assertNull(userRepository.findByUsername("testUsername"));
+
+        assertThrows(ResponseStatusException.class, () -> userService.getUser(1L));
+    }
+
 }

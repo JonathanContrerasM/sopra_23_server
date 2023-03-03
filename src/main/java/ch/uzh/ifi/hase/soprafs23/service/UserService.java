@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -101,8 +102,8 @@ public class UserService {
         User userFromDB = userRepository.findById(id);
         checkIfUserFromIdIsNull(userFromDB);
 
-        //check if username already is taken
-        //checkIfUsernameExists(userInput.getUsername());
+        //check for access
+        checkAccess(userInput, userFromDB);
 
         //Overwrite
         userFromDB.setBirthdate(userInput.getBirthdate());
@@ -110,6 +111,14 @@ public class UserService {
         userRepository.saveAndFlush(userFromDB);
 
         return userFromDB;
+    }
+
+
+    private static void checkAccess(User userInput, User userFromDB) {
+        if (!Objects.equals(userInput.getToken(), userFromDB.getToken())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                    "You have no access to change this Users Information");
+        }
     }
 
 

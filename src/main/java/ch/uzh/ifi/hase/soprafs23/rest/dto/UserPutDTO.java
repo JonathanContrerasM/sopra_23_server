@@ -11,6 +11,8 @@ public class UserPutDTO {
 
     private String birthdate;
 
+    private String token;
+
 
     public String getEmail() {
         return email;
@@ -42,6 +44,14 @@ public class UserPutDTO {
 
     public void setBirthdate(String birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
 

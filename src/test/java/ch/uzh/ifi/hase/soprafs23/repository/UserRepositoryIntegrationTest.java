@@ -47,4 +47,31 @@ public class UserRepositoryIntegrationTest {
     assertEquals(found.getToken(), user.getToken());
     assertEquals(found.getStatus(), user.getStatus());
   }
+
+
+    @Test
+    public void findByEmail_success() {
+        // given
+        User user = new User();
+        user.setEmail("Email");
+        user.setUsername("firstname@lastname");
+        user.setPassword("1234");
+        user.setStatus(UserStatus.OFFLINE);
+        user.setToken("1");
+        user.setCreationDate(new Date());
+        user.setRegistrationDate("20-20-2022");
+
+        entityManager.persist(user);
+        entityManager.flush();
+
+        // when
+        User found = userRepository.findByEmail(user.getEmail());
+
+        // then
+        assertNotNull(found.getId());
+        assertEquals(found.getEmail(), user.getEmail());
+        assertEquals(found.getUsername(), user.getUsername());
+        assertEquals(found.getToken(), user.getToken());
+        assertEquals(found.getStatus(), user.getStatus());
+    }
 }

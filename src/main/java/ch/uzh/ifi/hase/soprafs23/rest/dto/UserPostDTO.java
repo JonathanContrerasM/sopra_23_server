@@ -10,6 +10,7 @@ public class UserPostDTO {
 
     private String username;
 
+    private String token;
 
 
     public String getEmail() {
@@ -36,4 +37,11 @@ public class UserPostDTO {
         this.username = username;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
