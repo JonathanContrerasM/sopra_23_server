@@ -106,12 +106,15 @@ public class UserController {
      * @param id of the user logging out
      * @return the User that was set Offline
      */
-    @PutMapping("/setOffline/{id}")
+    @PutMapping("/users/offline/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public UserGetDTO setOffline(@PathVariable long id) {
+    public UserGetDTO setOffline(@RequestBody UserPutDTO userPutDTO, @PathVariable long id) {
+        //Transformation of representation
+        User userToken = DTOMapper.INSTANCE.convertUserPutDTOtoEntity(userPutDTO);
+
         //Set User Offline
-        User userOffline = userService.setUserOffline(id);
+        User userOffline = userService.setUserOffline(userToken, id);
         return DTOMapper.INSTANCE.convertEntityToUserGetDTO(userOffline);
     }
 }

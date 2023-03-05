@@ -184,8 +184,12 @@ public class UserService {
         return userById;
     }
 
-    public User setUserOffline(long id) {
+    public User setUserOffline(User userToken, long id) {
         User userOffline = userRepository.findById(id);
+
+        //Check Access
+        checkAccess(userToken, userOffline);
+
         userOffline.setStatus(UserStatus.OFFLINE);
         userRepository.saveAndFlush(userOffline);
 

@@ -200,6 +200,38 @@ public class UserControllerTest {
     }
 
 
+    @Test
+    public void successful_SetUserOffline() throws Exception {
+        //Given
+        User user = new User();
+        user.setId(1L);
+        user.setEmail("Email");
+        user.setUsername("testUsername");
+        user.setToken("555");
+        user.setStatus(UserStatus.OFFLINE);
+        user.setPassword("1234");
+
+
+        given(userService.setUserOffline(Mockito.any(), Mockito.anyLong())).willReturn(user);
+
+
+        UserPutDTO userPutDTO = new UserPutDTO();
+        userPutDTO.setToken("555");
+
+
+        // when/then -> do the request + validate the result
+        MockHttpServletRequestBuilder putRequest = put("/users/offline/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(userPutDTO));
+
+
+        // then
+        mockMvc.perform(putRequest)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
+    }
+
+
     /**
      * Helper Method to convert userPostDTO into a JSON string such that the input
      * can be processed
