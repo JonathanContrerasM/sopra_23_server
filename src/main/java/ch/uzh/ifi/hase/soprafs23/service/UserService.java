@@ -104,6 +104,7 @@ public class UserService {
 
         //check for access
         checkAccess(userInput, userFromDB);
+        checkIfUsernameExists(userInput);
 
         //Overwrite
         userFromDB.setBirthdate(userInput.getBirthdate());
@@ -156,12 +157,12 @@ public class UserService {
         }
     }
 
-    private void checkIfUsernameExists(String username) {
-        User userByUsername = userRepository.findByUsername(username);
+    private void checkIfUsernameExists(User user) {
+        User userByUsername = userRepository.findByUsername(user.getUsername());
 
         if (userByUsername != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    String.format("username already taken"));
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Username already taken");
         }
     }
 
