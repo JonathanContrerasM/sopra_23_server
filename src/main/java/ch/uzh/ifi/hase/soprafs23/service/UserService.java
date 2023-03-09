@@ -104,7 +104,10 @@ public class UserService {
 
         //check for access
         checkAccess(userInput, userFromDB);
-        checkIfUsernameExists(userInput);
+        //Check Username changes and Duplicates
+        if (checkIfUsernameChanged(userInput, userFromDB)){
+            checkIfUsernameExists(userInput);
+        }
 
         //Overwrite
         userFromDB.setBirthdate(userInput.getBirthdate());
@@ -112,6 +115,16 @@ public class UserService {
         userRepository.saveAndFlush(userFromDB);
 
         return userFromDB;
+    }
+
+    /**
+     *
+     * @param userInput contains the username from the input field
+     * @param userFromDB contains the username form the database that was fetched from the id
+     * @return true if the username changed and false if it stayed the same
+     */
+    private Boolean checkIfUsernameChanged(User userInput, User userFromDB) {
+        return !Objects.equals(userInput.getUsername(), userFromDB.getUsername());
     }
 
 
